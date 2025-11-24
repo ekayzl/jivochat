@@ -4,8 +4,8 @@ import fetch from "node-fetch";
 const app = express();
 app.use(express.json());
 
-const TELEGRAM_TOKEN = "SEU_TOKEN";
-const CHAT_ID = "SEU_CHAT_ID";
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 app.post("/webhook", async (req, res) => {
     const data = req.body;
@@ -22,7 +22,7 @@ app.post("/webhook", async (req, res) => {
             })
         });
     } catch (err) {
-        console.error("Erro ao enviar mensagem:", err);
+        console.error("Erro ao enviar para Telegram:", err);
     }
 
     res.json({
