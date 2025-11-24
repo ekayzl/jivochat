@@ -10,13 +10,15 @@ const CHAT_ID = "SEU_CHAT_ID";
 app.post("/webhook", async (req, res) => {
     const data = req.body;
 
+    console.log("Recebido do Jivo:", data);
+
     try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 chat_id: CHAT_ID,
-                text: `Nova mensagem no JivoChat:\n\n${JSON.stringify(data)}`
+                text: `Nova mensagem no JivoChat:\n\n${JSON.stringify(data, null, 2)}`
             })
         });
     } catch (err) {
