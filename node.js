@@ -4,45 +4,54 @@ import fetch from "node-fetch";
 const app = express();
 app.use(express.json());
 
-// COLOQUE SEU TOKEN E CHAT ID AQUI
-const TELEGRAM_TOKEN = "8135423857:AAHa_5uFQO_mshsZCj0oQdB4ngc8UThxu-w";
-const CHAT_ID = "8436274548";
+const TELEGRAM_TOKEN = "SEU_TOKEN";
+const CHAT_ID = "SEU_CHAT_ID";
 
-// Webhook principal da Jivo
 app.post("/webhook", async (req, res) => {
     const data = req.body;
 
     console.log("Recebido do Jivo:", data);
 
-    // Enviar para Telegram
+    // Envia para Telegram
     try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 chat_id: CHAT_ID,
-                text: `Nova mensagem do Jivo:\n\n${JSON.stringify(data, null, 2)}`
+                text: `Nova mensagem no JivoChat:\n\n${JSON.stringify(data, null, 2)}`
             })
         });
     } catch (err) {
-        console.error("Erro ao enviar mensagem:", err);
+        console.error("Erro ao enviar mensagem Telegram:", err);
     }
 
-    // Enviar resposta automática depois de 2 segundos
-    setTimeout(() => {
-        console.log("Respondendo ao Jivo...");
+    // --------- RESPONDER AO CLIENTE NA JIVO (EVENTO CORRETO) ---------
+    if (data.event_name === "chat_started") {
 
-        // Isso manda uma resposta automática
-        // A Jivochat entende como uma resposta do bot
-        // e mostra pro cliente
-        res.json({
-            type: "message",
-            text: "Olá! Tudo bem? Já estou te atendendo 😄"
-        });
-    }, 2000); // 2 segundos
+        console.log("Respondendo ao cliente no Jivo...");
+
+        // Delay de 2 segundos ANTES de responder
+        setTimeout(async () => {
+            try {
+                await fetch("https://api.jivochat.com/webhooks/response", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        type: "message",
+                        text: "Olá! Tudo bem? Já estou te atendendo 😄"
+                    })
+                });
+            } catch (err) {
+                console.error("Erro ao enviar resposta automática:", err);
+            }
+        }, 2000);
+    }
+
+    // Resposta pro webhook
+    res.json({ ok: true });
 });
 
-// Home
 app.get("/", (req, res) => {
     res.send("Webhook ativo!");
 });
