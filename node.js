@@ -12,7 +12,7 @@ app.post("/webhook", async (req, res) => {
 
     console.log("Recebido do Jivo:", data);
 
-    // 🔥 Enviar mensagem para o Telegram (continua igual)
+    // Envia para Telegram (continua igual)
     try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: "POST",
@@ -26,28 +26,11 @@ app.post("/webhook", async (req, res) => {
         console.error("Erro ao enviar mensagem:", err);
     }
 
-    // 🔥 Resposta ORIGINAL do seu webhook (não mudei nada)
-    res.json({
-        reply: "Tudo bem? Com o que posso te ajudar hoje?"
-    });
-
-    // 🔥 Após 2 segundos, envia a PRIMEIRA mensagem automática no chat
-    setTimeout(async () => {
-        try {
-            await fetch(`https://api.jivochat.com/webhooks/response`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: data.chat_id,
-                    type: "message",
-                    text: "Tudo bem? Como posso te ajudar hoje?" 
-                })
-            });
-
-            console.log("Mensagem automática enviada após 2s");
-        } catch (err) {
-            console.log("Erro ao enviar resposta automática:", err);
-        }
+    // 🕒 Atraso de 2 segundos antes de responder ao Jivo
+    setTimeout(() => {
+        res.json({
+            reply: "Olá! Tudo bem? Como posso te ajudar hoje?"
+        });
     }, 2000);
 });
 
